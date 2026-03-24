@@ -21,6 +21,7 @@ import { initDashboard } from "./dashboard.js";
 import { initArchive } from "./archive.js";
 import { initPMA, setPMARefreshActive } from "./pma.js";
 import { initNotifications } from "./notifications.js";
+import { titleManager } from "./titleManager.js";
 
 let pmaInitialized = false;
 
@@ -36,6 +37,7 @@ function showHubView(): void {
   const pmaShell = document.getElementById("pma-shell");
   if (hubShell) hubShell.classList.remove("hidden");
   if (pmaShell) pmaShell.classList.add("hidden");
+  titleManager.setHubView();
   setPMARefreshActive(false);
   updateModeToggle("manual");
   updateUrlParams({ view: null });
@@ -46,6 +48,7 @@ function showPMAView(): void {
   const pmaShell = document.getElementById("pma-shell");
   if (hubShell) hubShell.classList.add("hidden");
   if (pmaShell) pmaShell.classList.remove("hidden");
+  titleManager.setHubView();
   updateModeToggle("pma");
   void initPMAView().then(() => {
     setPMARefreshActive(true);
@@ -90,6 +93,7 @@ async function probePMAEnabled(): Promise<boolean> {
 }
 
 async function initHubShell(): Promise<void> {
+  titleManager.setHubView();
   const hubShell = document.getElementById("hub-shell");
   const repoShell = document.getElementById("repo-shell");
   const manualBtns = Array.from(
@@ -144,6 +148,7 @@ async function initRepoShell(): Promise<void> {
   await initHealthGate();
 
   if (REPO_ID) {
+    titleManager.setRepoView(REPO_ID);
     const navBar = document.querySelector(".nav-bar");
     if (navBar) {
       const backBtn = document.createElement("a");

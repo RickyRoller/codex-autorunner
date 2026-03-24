@@ -152,6 +152,9 @@
       "path": "generated/ticketVoice.js"
     },
     {
+      "path": "generated/titleManager.js"
+    },
+    {
       "path": "generated/turnEvents.js"
     },
     {

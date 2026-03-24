@@ -5,6 +5,7 @@ import { HUB_BASE } from "./env.js";
 import { preserveScroll } from "./preserve.js";
 import { initNotificationBell } from "./notificationBell.js";
 import { describeUpdateTarget, getUpdateTarget, includesWebUpdateTarget, normalizeUpdateTarget, updateRestartNotice, updateTargetOptionsFromResponse, } from "./updateTargets.js";
+import { titleManager } from "./titleManager.js";
 function nonPmaChatBoundThreadCount(repo) {
     if (repo.non_pma_chat_bound_thread_count != null) {
         return Math.max(0, Number(repo.non_pma_chat_bound_thread_count || 0));
@@ -1941,6 +1942,14 @@ function applyHubData(data) {
         pinned_parent_repo_ids: normalizePinnedParentRepoIds(data?.pinned_parent_repo_ids),
     };
     pinnedParentRepoIds = new Set(normalizePinnedParentRepoIds(hubData.pinned_parent_repo_ids));
+    const hasWorkingRepo = hubData.repos.some((repo) => {
+        const flowStatus = repoFlowStatus(repo);
+        return (repo.ticket_flow_display?.is_active === true ||
+            flowStatus === "pending" ||
+            flowStatus === "running" ||
+            flowStatus === "stopping");
+    });
+    titleManager.setHubWorking(hasWorkingRepo);
 }
 async function refreshHub() {
     setButtonLoading(true);

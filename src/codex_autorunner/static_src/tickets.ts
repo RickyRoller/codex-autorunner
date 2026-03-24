@@ -21,6 +21,7 @@ import { summarizeEvents, renderCompactSummary, COMPACT_MAX_TEXT_LENGTH } from "
 import { refreshBell, renderMarkdown } from "./messages.js";
 import { preserveScroll } from "./preserve.js";
 import { createSmartRefresh } from "./smartRefresh.js";
+import { titleManager } from "./titleManager.js";
 
 type FlowEvent = {
   seq?: number;
@@ -850,6 +851,7 @@ function handleFlowEvent(event: FlowEvent): void {
     if (nextTicket) {
       currentActiveTicket = nextTicket;
       // Don't force flow status here; it comes from the runs endpoint.
+      titleManager.setRepoTicket(currentActiveTicket, currentFlowStatus);
       const { current } = els();
       if (current) current.textContent = currentActiveTicket;
       if (ticketListCache) {
@@ -1905,6 +1907,7 @@ async function loadTicketFlow(ctx?: RefreshContext): Promise<void> {
     currentActiveTicket = apiActiveTicket;
     const ticketTurns = (ticketEngine?.ticket_turns as number) ?? null;
     const totalTurns = (ticketEngine?.total_turns as number) ?? null;
+    titleManager.setRepoTicket(currentActiveTicket, currentFlowStatus);
 
     if (status) statusPill(status, (latest?.status as string) || "idle");
     if (run) run.textContent = latest?.id || "–";
@@ -2392,6 +2395,7 @@ async function archiveTicketFlow(): Promise<void> {
     currentFlowStatus = null;
     currentActiveTicket = null;
     currentReasonFull = null;
+    titleManager.setRepoTicket(null, null);
 
     // Reset all UI elements to idle state directly (avoid re-fetching stale data)
     const { status, run, current, turn, elapsed, progress, lastActivity, stalePill, reconnectBtn, workerStatus, workerPill, recoverBtn, bootstrapBtn, resumeBtn, stopBtn, restartBtn, archiveBtn } = els();

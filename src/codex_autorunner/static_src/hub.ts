@@ -21,6 +21,7 @@ import {
   updateRestartNotice,
   updateTargetOptionsFromResponse,
 } from "./updateTargets.js";
+import { titleManager } from "./titleManager.js";
 
 interface HubTicketFlow {
   status: string;
@@ -2523,6 +2524,16 @@ function applyHubData(data: HubData): void {
   pinnedParentRepoIds = new Set(
     normalizePinnedParentRepoIds(hubData.pinned_parent_repo_ids)
   );
+  const hasWorkingRepo = hubData.repos.some((repo) => {
+    const flowStatus = repoFlowStatus(repo);
+    return (
+      repo.ticket_flow_display?.is_active === true ||
+      flowStatus === "pending" ||
+      flowStatus === "running" ||
+      flowStatus === "stopping"
+    );
+  });
+  titleManager.setHubWorking(hasWorkingRepo);
 }
 
 async function refreshHub(): Promise<void> {
